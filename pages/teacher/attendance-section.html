@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Boxicons CSS -->
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
+    <title>EAST-Y CHECK</title>
+    <link rel="stylesheet" />
+    <style>
+        @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap");
+    </style>
+    <link href="../../assets/css/dashboard.css" rel="stylesheet" />
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../../assets/css/styles.css">
+    <!-- Another Custom CSS-->
+    <link rel="stylesheet" href="../../assets/css/basta.css">
+</head>
+
+<!-- navbar -->
+<nav class="navbar" aria-label="Main Navigation">
+    <div class="logo_item">
+        <i class="bx bx-menu" id="sidebarOpen"></i>
+        <img src="../../assets/img/ue-logo.png" alt=""><strong>EAST-Y CHECK</strong>
+    </div>
+
+    <div class="navbar_content">
+        <i class="bi bi-grid"></i>
+        <i class='bx bx-bell'></i>
+    </div>
+</nav>
+
+
+<body>
+    <!-- Sidebar -->
+    <nav class="sidebar" aria-label="Sidebar Navigation">
+        <div class="menu_content">
+
+            <ul class="menu_items">
+                <div class="menu_title menu_editor"></div>
+                <li class="item active">
+                    <a href="classes-selection.html" class="nav_link">
+                        <span class="navlink_icon">
+                            <i class="bx bx-list-ul"></i>
+                        </span>
+                        <span class="navlink">Classes</span>
+                    </a>
+                </li>
+                <li class="item">
+                    <a href="summary.html" class="nav_link">
+                        <span class="navlink_icon">
+                            <i class="bx bx-cloud-upload"></i>
+                        </span>
+                        <span class="navlink">Summary</span>
+                    </a>
+                </li>
+            </ul>
+
+            <ul class="menu_items">
+                <div class="menu_title menu_setting"></div>
+                <li class="item">
+                    <a href="../../index.html" class="nav_link" id="logoutButton">
+                        <span class="navlink_icon">
+                            <i class="bx bx-log-out"></i>
+                        </span>
+                        <span class="navlink">Logout</span>
+                    </a>
+                </li>
+            </ul>
+            <!-- Sidebar Open / Close -->
+            <div class="bottom_content">
+                <div class="bottom expand_sidebar">
+                    <span> Expand</span>
+                    <i class='bx bx-collapse-horizontal'></i>
+                </div>
+                <div class="bottom collapse_sidebar">
+                    <span> Collapse</span>
+                    <i class='bx bx-collapse-horizontal'></i>
+                </div>
+            </div>
+        </div>
+    </nav>
+</body>
+
+<body>
+
+    <body>
+        <!-- Class Details -->
+        <div class="container mt-4">
+            <div class="card">
+                <div class="card-header" style="background-color: #60100B; color: white;">
+                    <h3 id="classTitle" class="mb-0">Class Details</h3>
+                </div>
+                <div class="card-body">
+                    <div class="class-details">
+                        <p><strong>Room:</strong> <span id="classRoom"></span></p>
+                        <p><strong>Date: </strong><span id="date"></span></p>
+                        <p>‎</p>
+                    </div>
+                    <div class="qr-container">
+                        <div id="qrcode" class="qr-code"></div>
+                    </div>
+                    <p><strong>Class Time: </strong><input type="time" id="startTimeInput"> - <input type="time"
+                            id="endTimeInput"></p>
+                    <button class="btn btn-danger" id="updateTimeButton">Update Time</button>
+
+                    <!-- Grant Access Section (Minimal & Styled for Simplex Theme) -->
+                    <div class="form-inline mt-3">
+                        <label for="studentSelect" class="mr-2">Grant Secretary Access:</label>
+                        <select id="studentSelect" class="form-control mr-2">
+                            <option value="">Select Student</option>
+                        </select>
+                        <button class="btn btn-success" onclick="grantAccess()">Grant</button>
+                    </div>
+                    <small id="message" class="text-muted"></small>
+                </div>
+            </div>
+        </div>
+    </body>
+
+
+    <body>
+        <!-- Attendance Table -->
+        <div class="container mt-4">
+            <div class="card">
+                <div class="card-header" style="background-color: #60100B; color: white;">
+                    <h3 class="mb-0">Class List</h3>
+                </div>
+                <div class="card-body">
+                    <table class="table table-bordered table-striped">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>Student ID</th>
+                                <th>Name</th>
+                                <th>Course</th>
+                                <th>Status</th>
+                                <th>Timestamp</th>
+                            </tr>
+                        </thead>
+                        <tbody id="studentTable"></tbody>
+                    </table>
+                    <!-- Reset and Export Button -->
+                    <button class="btn btn-danger" id="resetButton">Reset</button>
+                    <button class="btn" id="saveAttendanceBtn" style="background-color: #60100B; color: white;">Save
+                        Attendance</button>
+                    <button class="btn" style="background-color: #60100B; color: white;" id="exportBtn">Export</button>
+                </div>
+            </div>
+        </div>
+        
+        <script>
+            const body = document.querySelector("body");
+            const darkLight = document.querySelector("#darkLight");
+            const sidebar = document.querySelector(".sidebar");
+            const submenuItems = document.querySelectorAll(".submenu_item");
+            const sidebarOpen = document.querySelector("#sidebarOpen");
+            const sidebarClose = document.querySelector(".collapse_sidebar");
+            const sidebarExpand = document.querySelector(".expand_sidebar");
+            sidebarOpen.addEventListener("click", () => sidebar.classList.toggle("close"));
+            sidebarClose.addEventListener("click", () => {
+                sidebar.classList.add("close", "hoverable");
+            });
+            sidebarExpand.addEventListener("click", () => {
+                sidebar.classList.remove("close", "hoverable");
+            });
+            sidebar.addEventListener("mouseenter", () => {
+                if (sidebar.classList.contains("hoverable")) {
+                    sidebar.classList.remove("close");
+                }
+            });
+            sidebar.addEventListener("mouseleave", () => {
+                if (sidebar.classList.contains("hoverable")) {
+                    sidebar.classList.add("close");
+                }
+            });
+
+            submenuItems.forEach((item, index) => {
+                item.addEventListener("click", () => {
+                    item.classList.toggle("show_submenu");
+                    submenuItems.forEach((item2, index2) => {
+                        if (index !== index2) {
+                            item2.classList.remove("show_submenu");
+                        }
+                    });
+                });
+            });
+            if (window.innerWidth < 768) {
+                sidebar.classList.add("close");
+            } else {
+                sidebar.classList.remove("close");
+            }
+
+        </script>
+        <!-- Firebase Script -->
+        <script type="module">
+            import { initializeApp } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-app.js";
+            import { getDatabase, ref, set, remove, get, onChildAdded, onChildChanged, update } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-database.js";
+
+            const firebaseConfig = {
+                apiKey: "AIzaSyA0hTRuEgjrP9YQ4LwkHcSUf7xkdl9lBgI",
+                authDomain: "attendify12-ai.firebaseapp.com",
+                databaseURL: "https://attendify12-ai-default-rtdb.asia-southeast1.firebasedatabase.app/",
+                projectId: "attendify12-ai",
+                storageBucket: "attendify12-ai.firebasestorage.app",
+                messagingSenderId: "374044642888",
+                appId: "1:374044642888:web:44706986d500af43a0927d"
+            };
+
+            const app = initializeApp(firebaseConfig);
+            const db = getDatabase(app);
+
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const classId = urlParams.get("classId");
+            const teacherId = urlParams.get("teacherId");
+
+            const classPath = `classes/${teacherId}/${classId}/students`;
+
+            let studentsData = [];
+            let classTime;
+
+            if (!teacherId || !classId) {
+                alert("Missing teacher or class ID!");
+                console.error("No info found: teacherId or classId is missing.");
+            } else {
+                fetchClassDetails();
+            }
+
+            async function fetchClassDetails() {
+                if (!classId) {
+                    alert("No class selected!");
+                    return;
+                }
+
+                try {
+                    console.log("Fetching class details...");
+                    const classRef = ref(db, `classes/${teacherId}/${classId}`);
+                    const snapshot = await get(classRef);
+
+                    if (snapshot.exists()) {
+                        const classData = snapshot.val();
+                        console.log("Class Data:", classData);
+
+                        function convertTo12HourFormat(time) {
+                            let [hour, minute] = time.split(":").map(Number);
+                            let period = hour >= 12 ? "PM" : "AM";
+                            hour = hour % 12 || 12;
+                            return `${hour}:${minute.toString().padStart(2, "0")} ${period}`;
+                        }
+
+                        document.getElementById("classTitle").innerText = `Class: ${classData.section}`;
+                        document.getElementById("classRoom").innerText = classData.room;
+                        document.getElementById("date").textContent = new Date().toLocaleDateString('en-US', {
+                            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+                        });
+
+                        classTime = `${convertTo12HourFormat(classData.startTime)} - ${convertTo12HourFormat(classData.endTime)}`;
+                        document.getElementById("startTimeInput").value = classData.startTime;
+                        document.getElementById("endTimeInput").value = classData.endTime;
+                        console.log(`Class Time: ${classTime}`);
+
+                        // ✅ Clear table before adding students to prevent duplicates
+                        const tbody = document.getElementById("studentTable");
+                        tbody.innerHTML = "";
+
+                        studentsData = classData.students ? Object.values(classData.students) : [];
+                        console.log("Students Data:", studentsData);
+
+                        // Fetch all attendance records at once
+                        const attendanceRef = ref(db, `attendance/${classId}`);
+                        const attendanceSnapshot = await get(attendanceRef);
+
+                        let attendanceData = {};
+                        if (attendanceSnapshot.exists()) {
+                            attendanceData = attendanceSnapshot.val();
+                            console.log("Fetched Attendance Data:", attendanceData);
+                        }
+
+                        studentsData.forEach((student) => {
+                            console.log(`Adding student: ${student.name}`);
+
+                            // ✅ Avoid duplicate rows by checking if it already exists
+                            if (!document.querySelector(`tr[data-id="${student.id}"]`)) {
+                                const row = `<tr data-id="${student.id}">
+                        <td>${student.id}</td>
+                        <td>${student.name}</td>
+                        <td>${student.course}</td>
+                        <td id="status-${student.id}">-</td> 
+                        <td id="timestamp-${student.id}">-</td> <!-- New column for timestamp -->
+                    </tr>`;
+                                tbody.innerHTML += row;
+                            }
+
+                            const statusCell = document.querySelector(`#status-${student.id}`);
+                            const timestampCell = document.querySelector(`#timestamp-${student.id}`);
+
+                            if (attendanceData[student.id]) {
+                                const studentAttendance = attendanceData[student.id];
+
+                                // ✅ Fetch and display status
+                                if (studentAttendance.status !== "-") {  // Don't update if status is "-"
+                                    statusCell.textContent = studentAttendance.status;
+
+                                    // ✅ Apply color based on status
+                                    switch (studentAttendance.status) {
+                                        case "Absent":
+                                            statusCell.style.color = "red";
+                                            break;
+                                        case "Present":
+                                            statusCell.style.color = "green";
+                                            break;
+                                        case "Late":
+                                            statusCell.style.color = "orange";
+                                            break;
+                                        case "Cutting":
+                                            statusCell.style.color = "blue";
+                                            break;
+                                        default:
+                                            statusCell.style.color = "black";
+                                    }
+
+                                    // ✅ Fetch and display timestamp
+                                    if (studentAttendance.timestamp) {
+                                        const localTimestamp = new Date(studentAttendance.timestamp).toLocaleString('en-US', {
+                                            hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true
+                                        });
+                                        timestampCell.textContent = localTimestamp;
+                                    }
+                                }
+                            }
+                        });
+
+                        listenForLoginChanges();
+                        listenForAttendanceChanges();
+                    } else {
+                        alert("Class not found!");
+                    }
+                } catch (error) {
+                    console.error("Error fetching class data:", error);
+                }
+            }
+
+
+            function updateClassTime() {
+                const newStartTime = document.getElementById("startTimeInput").value;
+                const newEndTime = document.getElementById("endTimeInput").value;
+
+                if (!newStartTime || !newEndTime) {
+                    alert("Please enter both start and end times.");
+                    return;
+                }
+
+                const classRef = ref(db, `classes/${teacherId}/${classId}`);
+
+                update(classRef, {
+                    startTime: newStartTime,
+                    endTime: newEndTime
+                })
+                    .then(() => {
+                        alert("Class time updated successfully!");
+                        updateTimeButton.style.display = "none"; // Hide the button immediately after a successful update
+                    })
+                    .catch((error) => {
+                        console.error("Error updating class time:", error);
+                        alert("Failed to update class time.");
+                    });
+
+            }
+
+
+            // Attach event listener to the button
+            document.getElementById("updateTimeButton").addEventListener("click", updateClassTime);
+
+            // Initially hide the button
+            updateTimeButton.style.display = "none";
+
+            // Function to show the button when interacting with time inputs
+            function showUpdateButton() {
+                updateTimeButton.style.display = "block";
+            }
+
+            // Attach event listeners to both time inputs
+            startTimeInput.addEventListener("input", showUpdateButton);
+            endTimeInput.addEventListener("input", showUpdateButton);
+
+            // Listen for attendance status changes in real-time
+            function listenForAttendanceChanges() {
+                console.log("Listening for attendance changes...");
+                const attendanceRef = ref(db, `attendance/${classId}`);
+
+                onChildChanged(attendanceRef, (snapshot) => {
+                    const attendanceData = snapshot.val();
+                    console.log("Attendance data changed:", attendanceData);
+
+                    // Find the student's row in the table by student ID
+                    const studentId = attendanceData.id;
+                    const status = attendanceData.status;
+
+                    // Find the status cell in the table by student ID
+                    const statusCell = document.querySelector(`#status-${studentId}`);
+
+                    if (statusCell) {
+                        // Update the status text in the table
+                        statusCell.innerText = status;
+
+                        // Apply color based on the attendance status
+                        switch (status) {
+                            case "Absent":
+                                statusCell.style.color = "red"; // Set color to red for "Absent"
+                                break;
+                            case "Present":
+                                statusCell.style.color = "green"; // Set color to green for "Present"
+                                break;
+                            case "Late":
+                                statusCell.style.color = "orange"; // Set color to orange for "Late"
+                                break;
+                            case "Cutting":
+                                statusCell.style.color = "blue"; // Set color to orange for "Late"
+                                break;
+                            default:
+                                statusCell.style.color = "-"; // Reset to default if status is unknown
+                                break;
+                        }
+
+                        // Update the timestamp column if necessary
+                        const timestampCell = statusCell.nextElementSibling; // Assuming the timestamp is in the next <td>
+                        if (timestampCell) {
+                            timestampCell.innerText = new Date(attendanceData.timestamp).toLocaleString();
+                        }
+                    } else {
+                        // If the row doesn't exist, create a new one (you can do this if necessary)
+                        const tbody = document.getElementById("studentTable");
+                        const newRow = `<tr data-id="${studentId}">
+                <td>${attendanceData.id}</td>
+                <td>${attendanceData.name}</td>
+                <td>${attendanceData.course}</td>
+                <td id="status-${studentId}">${status}</td>
+                <td>${new Date(attendanceData.timestamp).toLocaleString()}</td>
+            </tr>`;
+                        tbody.innerHTML += newRow;
+                    }
+                });
+            }
+            async function markAbsentAfterEndTime() {
+                console.log("Checking for absent students after class ends...");
+
+                if (!classId) return;
+
+                const classRef = ref(db, `classes/${teacherId}/${classId}`);
+                const classSnapshot = await get(classRef);
+
+                if (classSnapshot.exists()) {
+                    const classData = classSnapshot.val();
+                    const startTime = classData.startTime; // Get the start time from class data
+                    const endTime = classData.endTime; // Get the end time from class data
+
+                    // Debugging the values of startTime and endTime
+                    console.log("Class Data:", classData); // Full class data to inspect values
+                    console.log("Start Time:", startTime);
+                    console.log("End Time:", endTime);
+
+                    const today = new Date().toDateString();
+                    const classStartDateTime = new Date(`${today} ${startTime}:00`); // Start time for today
+                    const classEndDateTime = new Date(`${today} ${endTime}:00`); // End time for today
+                    const currentTime = new Date();
+
+                    // Debugging the class start and end date-time calculations
+                    console.log("Class Start DateTime:", classStartDateTime);
+                    console.log("Class End DateTime:", classEndDateTime);
+                    console.log("Current Time:", currentTime);
+
+                    // Check if the current time is after class end time
+                    if (currentTime > classEndDateTime) {
+                        console.log("Class has ended. Marking absent students...");
+
+                        const attendanceRef = ref(db, `attendance/${classId}`);
+                        const attendanceSnapshot = await get(attendanceRef);
+
+                        if (attendanceSnapshot.exists()) {
+                            const attendanceData = attendanceSnapshot.val();
+
+                            for (const studentId in attendanceData) {
+                                let studentStatus = attendanceData[studentId].status;
+
+                                // Only mark students absent if they were never marked as Present or Late
+                                if (studentStatus === "-") {
+                                    console.log(`Marking ${studentId} as Absent`);
+
+                                    // Update the attendance status without overwriting other data
+                                    update(ref(db, `attendance/${classId}/${studentId}`), {
+                                        status: "Absent",
+                                        timestamp: new Date().toISOString()
+                                    });
+                                }
+                            }
+                        }
+                    } else if (currentTime < classStartDateTime) {
+                        console.log("Class hasn't started yet. No changes made.");
+                    } else {
+                        console.log("Class is still ongoing. No changes made.");
+                    }
+                } else {
+                    console.log("Class not found.");
+                }
+            }
+            function listenForLoginChanges() {
+                console.log("Listening for login changes...");
+                const loginsRef = ref(db, "logins");
+
+                onChildAdded(loginsRef, (snapshot) => {
+                    console.log("New login detected:", snapshot.val());
+                    const loginData = snapshot.val();
+
+                    // Convert the login ID to a string to match with attendance ID
+                    const loginId = loginData.id.toString(); // Convert to string
+                    console.log("Login ID (string):", loginId);  // Debugging line to check login ID
+
+                    // Update attendance for the student by matching IDs
+                    updateAttendance(loginId);
+                });
+
+                onChildChanged(loginsRef, (snapshot) => {
+                    console.log("Login status changed:", snapshot.val());
+                    const loginData = snapshot.val();
+
+                    // Convert the login ID to a string to match with attendance ID
+                    const loginId = loginData.id.toString(); // Convert to string
+                    console.log("Login ID (string):", loginId);  // Debugging line to check login ID
+
+                    // Update attendance for the student by matching IDs
+                    updateAttendance(loginId);
+                });
+            }
+
+            async function updateAttendance(studentId) {
+                console.log(`Updating attendance for ${studentId}...`);
+
+                const attendanceRef = ref(db, `attendance/${classId}/${studentId}`);
+                console.log("Attendance Reference Path:", `attendance/${classId}/${studentId}`);
+
+                // Fetch the current attendance record for the student
+                const snapshot = await get(attendanceRef);
+
+                if (snapshot.exists()) {
+                    const attendanceData = snapshot.val();
+                    const currentStatus = attendanceData.status;
+
+                    // Stop updating if the student is already marked
+                    if (currentStatus === "Present" || currentStatus === "Late" || currentStatus === "Absent") {
+                        console.log(`Skipping update for ${studentId}, already marked as ${currentStatus}.`);
+                        return; // Stop execution
+                    }
+
+                    const currentTime = new Date();
+
+                    // Fetch class start time from Firebase
+                    const classRef = ref(db, `classes/${teacherId}/${classId}`);
+                    const classSnapshot = await get(classRef);
+
+                    if (classSnapshot.exists()) {
+                        const classData = classSnapshot.val();
+                        const startTime = classData.startTime; // Example: "08:30"
+
+                        // Convert class start time into a Date object
+                        const today = new Date().toDateString();
+                        const classStartDateTime = new Date(`${today} ${startTime}:00`);
+
+                        // Determine if student is Present or Late
+                        let status = currentTime <= classStartDateTime ? "Present" : "Late";
+
+                        console.log(`Marking ${studentId} as ${status}`);
+
+                        // Only update the status field (don't overwrite timestamp)
+                        update(attendanceRef, { status })
+                            .then(() => console.log(`Attendance updated for ${studentId}: ${status}`))
+                            .catch((error) => console.error("Error updating attendance:", error));
+                    } else {
+                        console.error("Class data not found. Cannot determine class start time.");
+                    }
+                } else {
+                    console.warn(`No attendance record found for ${studentId}, skipping update.`);
+                }
+            }
+
+
+            // Function to reset attendance for all students
+            async function resetAttendance() {
+                console.log("Resetting attendance for all students...");
+
+                const attendanceRef = ref(db, `attendance/${classId}`);
+                const snapshot = await get(attendanceRef);
+
+                if (snapshot.exists()) {
+                    const attendanceData = snapshot.val();
+                    for (const studentId in attendanceData) {
+                        // Reset attendance status to "Absent"
+                        set(ref(db, `attendance/${classId}/${studentId}`), {
+                            id: studentId,
+                            status: "-",
+                            timestamp: new Date().toISOString() // Set a new timestamp
+                        });
+                        console.log(`Attendance reset for student ID: ${studentId}`);
+
+                        // Find the student's row in the table and update the status and timestamp
+                        const statusCell = document.querySelector(`#status-${studentId}`);
+                        if (statusCell) {
+                            statusCell.innerText = "-"; // Reset status to "Absent"
+                        }
+
+                        // Reset the timestamp to "-"
+                        const timestampCell = statusCell?.nextElementSibling; // Assuming the timestamp is in the next <td>
+                        if (timestampCell) {
+                            timestampCell.innerText = "-";  // Reset timestamp to "-"
+                        }
+                    }
+                }
+            }
+
+
+            // Function to reset the logins node in Firebase and reset attendance
+            function resetLogins() {
+                const loginsRef = ref(db, "logins");
+                remove(loginsRef)
+                    .then(() => {
+                        console.log("Logins reset successfully!");
+                        resetAttendance(); // Reset attendance when logins are cleared
+                    })
+                    .catch((error) => {
+                        console.error("Error resetting logins: ", error);
+                        alert("Failed to reset logins.");
+                    });
+            }
+
+            // Attach the reset functionality to the reset button
+            document.getElementById("resetButton").addEventListener("click", resetLogins);
+
+
+            // Export Button Functionality
+            document.getElementById('exportBtn').addEventListener('click', () => {
+                // Prepare CSV data
+                const rows = [['Student ID', 'Name', 'Role', 'Timestamp', 'Status']];
+                const table = document.getElementById('studentTable');  // Reference to the table where attendance is listed
+                const tableRows = table.getElementsByTagName('tr');
+
+                for (let row of tableRows) {
+                    const rowData = Array.from(row.getElementsByTagName('td')).map(cell => cell.textContent);
+                    rows.push(rowData);
+                }
+
+                // Create CSV file content
+                const csvContent = rows.map(row => row.join(',')).join('\n');
+                const blob = new Blob([csvContent], { type: 'text/csv' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = 'attendance_list.csv';
+                link.click();
+            });
+
+            document.getElementById("saveAttendanceBtn").addEventListener("click", async () => {
+                const classId = new URLSearchParams(window.location.search).get("classId");
+
+                if (!classId) {
+                    alert("⚠️ Missing Class ID!");
+                    return;
+                }
+
+                try {
+                    const response = await fetch("http://localhost:5000/saveAttendance", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ classId })
+                    });
+
+                    const data = await response.json();
+                    alert(data.message || "Attendance saved successfully!");
+                } catch (error) {
+                    console.error("❌ Error:", error);
+                    alert("❌ Failed to save attendance.");
+                }
+            });
+
+            // Function to load students from the database
+            function loadStudents() {
+                const studentSelect = document.getElementById("studentSelect");
+                const studentsRef = ref(db, classPath);
+
+                get(studentsRef)
+                    .then((snapshot) => {
+                        if (snapshot.exists()) {
+                            studentSelect.innerHTML = '<option value="">Select Student</option>'; // Clear previous options
+                            const students = snapshot.val();
+
+                            // Convert object to an array and loop through it
+                            Object.values(students).forEach((student) => {
+                                if (student.id && student.name) {  // Ensure data is correct
+                                    const option = document.createElement("option");
+                                    option.value = student.id;
+                                    option.textContent = `${student.name} (${student.id})`;
+                                    studentSelect.appendChild(option);
+                                }
+                            });
+                        } else {
+                            studentSelect.innerHTML = '<option>No students found</option>';
+                        }
+                    })
+                    .catch((error) => {
+                        console.error("Error fetching students:", error);
+                    });
+            }
+
+
+            // Function to grant attendance access
+            window.grantAccess = async function () {
+                const studentId = document.getElementById("studentSelect").value;
+                const message = document.getElementById("message");
+
+                if (!studentId) {
+                    message.innerHTML = "No student selected.";
+                    message.style.color = "red";
+                    return;
+                }
+
+                try {
+                    // Get the students list first to find the correct index
+                    const classRef = ref(db, classPath);
+                    const snapshot = await get(classRef);
+
+                    if (!snapshot.exists()) {
+                        message.innerHTML = "Error: No students found!";
+                        message.style.color = "red";
+                        return;
+                    }
+
+                    const students = snapshot.val();
+                    let studentKey = null;
+
+                    // Find the correct student index
+                    for (const key in students) {
+                        if (students[key].id === studentId) {
+                            studentKey = key;
+                            break;
+                        }
+                    }
+
+                    if (!studentKey) {
+                        message.innerHTML = "Error: Student not found!";
+                        message.style.color = "red";
+                        return;
+                    }
+
+                    // Reference to the correct student entry
+                    const studentRef = ref(db, `${classPath}/${studentKey}`);
+
+                    // Update only the `canAccessAttendance` field
+                    await update(studentRef, { canAccessAttendance: true });
+
+                    message.innerHTML = `Access granted to student: <strong>${studentId}</strong>`;
+                    message.style.color = "green";
+                } catch (error) {
+                    message.innerHTML = "Error: " + error.message;
+                    message.style.color = "red";
+                    console.error("Error updating access:", error);
+                }
+            };
+
+
+            // Load students on page load
+            window.onload = loadStudents;
+            setTimeout(markAbsentAfterEndTime);
+            fetchClassDetails();
+        </script>
+        <!-- Firebase and QR Code Script -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+        <script>
+            // QR Code Generator Function
+            function generateQRCode() {
+                var baseUrl = "https://ict312ai.github.io/student-login/index.html";
+                var randomQuery = Math.random().toString(36).substring(2, 15);
+                var finalUrl = baseUrl + "?id=" + randomQuery;
+
+                // Clear the previous QR code
+                document.getElementById("qrcode").innerHTML = "";
+
+                // Generate the new QR code
+                new QRCode(document.getElementById("qrcode"), {
+                    text: finalUrl,
+                    width: 200,
+                    height: 200,
+                    colorDark: "#A40000",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+
+                // Add the logo to the QR code
+                var logo = document.createElement("img");
+                logo.src = "../../assets/img/ue-logo.png"; // Path to your logo
+                logo.classList.add("logo");
+                document.getElementById("qrcode").appendChild(logo);
+            }
+
+            // Generate an initial QR code as soon as the page loads
+            generateQRCode();
+        </script>
+    </body>
+
+</html>

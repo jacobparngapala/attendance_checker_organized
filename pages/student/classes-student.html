@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Boxicons CSS -->
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
+    <title>EAST-Y CHECK</title>
+    <link rel="stylesheet" />
+    <style>
+        @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap");
+    </style>
+    <link href="../../assets/css/dashboard.css" rel="stylesheet" />
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <!-- buttons -->
+    <link rel="stylesheet" href="../../assets/css/navbar.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../../assets/css/styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="../../assets/css/buttonsxs.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+</head>
+
+<body>
+    <!-- navbar -->
+    <nav class="navbar" aria-label="Main Navigation">
+        <div class="logo_item">
+            <i class="bx bx-menu" id="sidebarOpen"></i>
+            <img src="../../assets/img/ue-logo.png" alt=""><strong>EAST-Y CHECK</strong>
+        </div>
+
+        <div class="navbar_content">
+            <i class="bi bi-grid"></i>
+            <i class='bx bx-bell'></i>
+        </div>
+    </nav>
+
+
+    <body>
+        <!-- Sidebar -->
+        <nav class="sidebar" aria-label="Sidebar Navigation">
+            <div class="menu_content">
+
+                <ul class="menu_items">
+                    <div class="menu_title menu_editor"></div>
+                    <li class="item active">
+                        <a href="classes-student.html" class="nav_link">
+                            <span class="navlink_icon">
+                                <i class="bx bx-list-ul"></i>
+                            </span>
+                            <span class="navlink">Classes</span>
+                        </a>
+                    </li>
+                </ul>
+
+                <ul class="menu_items">
+                    <div class="menu_title menu_setting"></div>
+                    <li class="item">
+                        <a href="../../index.html" class="nav_link" id="logoutButton">
+                            <span class="navlink_icon">
+                                <i class="bx bx-log-out"></i>
+                            </span>
+                            <span class="navlink">Logout</span>
+                        </a>
+                    </li>
+                </ul>
+                <!-- Sidebar Open / Close -->
+                <div class="bottom_content">
+                    <div class="bottom expand_sidebar">
+                        <span> Expand</span>
+                        <i class='bx bx-collapse-horizontal'></i>
+                    </div>
+                    <div class="bottom collapse_sidebar">
+                        <span> Collapse</span>
+                        <i class='bx bx-collapse-horizontal'></i>
+                    </div>
+                </div>
+            </div>
+            
+        </nav>
+    </body>
+    <!-- Available Classes Section -->
+    <div class="container mt-5">
+        <h3 class="text-center font-weight-bold" style="color: #60100B;">Available Classes</h3>
+        <div id="classButtons" class="mt-2"></div>
+
+        <!-- This is the missing element where attendance data will be shown -->
+        <div id="attendanceDisplay" class="mt-3 text-center"></div>
+    </div>
+
+    <!-- Bootstrap & jQuery Scripts -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- Custom Script -->
+    <script src="../../assets/js/classes.js"></script>
+</body>
+
+<script>
+    const body = document.querySelector("body");
+    const darkLight = document.querySelector("#darkLight");
+    const sidebar = document.querySelector(".sidebar");
+    const submenuItems = document.querySelectorAll(".submenu_item");
+    const sidebarOpen = document.querySelector("#sidebarOpen");
+    const sidebarClose = document.querySelector(".collapse_sidebar");
+    const sidebarExpand = document.querySelector(".expand_sidebar");
+    sidebarOpen.addEventListener("click", () => sidebar.classList.toggle("close"));
+    sidebarClose.addEventListener("click", () => {
+        sidebar.classList.add("close", "hoverable");
+    });
+    sidebarExpand.addEventListener("click", () => {
+        sidebar.classList.remove("close", "hoverable");
+    });
+    sidebar.addEventListener("mouseenter", () => {
+        if (sidebar.classList.contains("hoverable")) {
+            sidebar.classList.remove("close");
+        }
+    });
+    sidebar.addEventListener("mouseleave", () => {
+        if (sidebar.classList.contains("hoverable")) {
+            sidebar.classList.add("close");
+        }
+    });
+
+    submenuItems.forEach((item, index) => {
+        item.addEventListener("click", () => {
+            item.classList.toggle("show_submenu");
+            submenuItems.forEach((item2, index2) => {
+                if (index !== index2) {
+                    item2.classList.remove("show_submenu");
+                }
+            });
+        });
+    });
+    if (window.innerWidth < 768) {
+        sidebar.classList.add("close");
+    } else {
+        sidebar.classList.remove("close");
+    }
+
+</script>
+<script type="module">
+    // Import Firebase modules
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-app.js";
+    import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-database.js";
+
+    // Firebase Configuration
+    const firebaseConfig = {
+        apiKey: "AIzaSyA0hTRuEgjrP9YQ4LwkHcSUf7xkdl9lBgI",
+        authDomain: "attendify12-ai.firebaseapp.com",
+        databaseURL: "https://attendify12-ai-default-rtdb.asia-southeast1.firebasedatabase.app/",
+        projectId: "attendify12-ai",
+        storageBucket: "attendify12-ai.appspot.com",
+        messagingSenderId: "374044642888",
+        appId: "1:374044642888:web:44706986d500af43a0927d"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    // Get student ID from local storage
+    const studentId = localStorage.getItem("userID");
+
+    async function fetchStudentClasses() {
+        if (!studentId) {
+            alert("Please log in to view your attendance.");
+            return;
+        }
+
+        const classesRef = ref(db, 'classes');
+        const snapshot = await get(classesRef);
+
+        if (snapshot.exists()) {
+            const classes = snapshot.val();
+            const classButtonsContainer = document.getElementById('classButtons');
+            classButtonsContainer.innerHTML = ''; // Clear previous buttons
+
+            for (const teacherId in classes) {
+                for (const classId in classes[teacherId]) {
+                    const classData = classes[teacherId][classId];
+                    if (classData && classData.students) {
+                        for (const student of classData.students) {
+                            if (student.id === studentId) {
+                                // Create button
+                                const button = document.createElement('button');
+                                button.textContent = classData.course;
+                                button.classList.add('attendance-button', 'btn', 'm-2');
+
+                                // Button click event
+                                button.onclick = () => {
+                                    console.log("Student:", student);
+                                    console.log("Saving to sessionStorage:", { teacherId, classId });
+
+                                    if (student.canAccessAttendance === true) {
+                                        // Redirect if student has access
+                                        if (teacherId && classId) {
+                                            sessionStorage.setItem("teacherId", teacherId);
+                                            sessionStorage.setItem("classId", classId);
+                                            window.location.href = "../secretary/secretary-attendance.html";
+                                        } else {
+                                            console.error("Missing teacherId or classId. Cannot proceed.");
+                                            alert("Error: Class data not found. Please try again.");
+                                        }
+                                    } else {
+                                        // Show attendance if no access
+                                        displayAttendance(teacherId, classId);
+                                    }
+                                };
+
+                                // Append button
+                                classButtonsContainer.appendChild(button);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Function to display the student's attendance for a selected class
+    async function displayAttendance(teacherId, classId) {
+        const attendanceRef = ref(db, `attendance/${classId}/${studentId}`);
+        const snapshot = await get(attendanceRef);
+
+        const attendanceDisplay = document.getElementById('attendanceDisplay');
+        if (!attendanceDisplay) {
+            console.error("Element with ID 'attendanceDisplay' not found.");
+            return;
+        }
+
+        attendanceDisplay.innerHTML = ''; // Clear previous display
+
+        if (snapshot.exists()) {
+            const attendanceData = snapshot.val();
+            attendanceDisplay.innerHTML = `
+            <p><strong>Status:</strong> ${attendanceData.status}</p>
+            <p><strong>Timestamp:</strong> ${new Date(attendanceData.timestamp).toLocaleString()}</p>
+        `;
+
+            // Apply color based on status
+            switch (attendanceData.status) {
+                case "Absent":
+                    attendanceDisplay.style.color = "red";
+                    break;
+                case "Present":
+                    attendanceDisplay.style.color = "green";
+                    break;
+                case "Late":
+                    attendanceDisplay.style.color = "orange";
+                    break;
+                case "Cutting":
+                    attendanceDisplay.style.color = "purple";
+                    break;
+                default:
+                    attendanceDisplay.style.color = "black";
+            }
+        } else {
+            attendanceDisplay.innerHTML = '<p>Attendance not recorded yet.</p>';
+        }
+    }
+
+    // Call fetchStudentClasses when the page loads
+    document.addEventListener('DOMContentLoaded', fetchStudentClasses);
+</script>
+
+</html>

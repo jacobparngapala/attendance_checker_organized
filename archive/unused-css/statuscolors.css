@@ -1,0 +1,11 @@
+.absent {
+    color: red;
+}
+
+.present {
+    color: green;
+}
+
+.late {
+    color: orange;
+}

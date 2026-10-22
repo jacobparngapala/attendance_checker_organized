@@ -1,0 +1,14 @@
+/* styles.css */
+.attendance-button {
+    background-color: #60100B !important; /* Force red */
+    color: white !important; /* Ensure white text */
+    font-size: 18px !important; /* Increase font size */
+    padding: 12px 24px !important; /* Increase padding */
+    border-radius: 6px !important; /* Rounded corners */
+    border: none !important; /* Remove border */
+    transition: background-color 0.3s ease-in-out !important;
+}
+
+.attendance-button:hover {
+    background-color: #60100B !important; /* Darker red on hover */
+}

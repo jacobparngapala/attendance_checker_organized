@@ -1,0 +1,39 @@
+.ue-logo {
+    width: 200px;
+    height: 200px;
+}
+
+.qr-code {
+    width: 200px;
+    height: 200px;
+}
+
+.navbar-brand {
+    font-size: 25px;
+    font-weight: bold;
+}
+
+.nav-item {
+    font-size: 20px;
+}
+
+.classes-buttons {
+    text-align: center;
+}
+
+.classes-buttons a {
+    font-size: 50px;
+    margin: 20px;
+}
+
+.students-table thead th {
+    font-size: 18px;
+}
+
+.students-table tbody tr {
+    font-size: 18px;
+}
+
+#success-section {
+    display: none;
+}

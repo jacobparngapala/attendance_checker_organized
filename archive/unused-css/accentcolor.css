@@ -1,0 +1,31 @@
+        /* Accent color */
+        .navbar {
+            background-color: #60100B !important;
+        }
+
+        .navbar .navbar-brand {
+            color: white;
+        }
+
+        .navbar .nav-link {
+            color: white !important;
+        }
+
+        .navbar .nav-link:hover {
+            color: #d4d4d4 !important;
+        }
+
+        .btn-primary {
+            background-color: #60100B !important;
+            border-color: #60100B;
+        }
+
+        .btn-primary:hover {
+            background-color: #60100B !important;
+            border-color: #60100B;
+        }
+
+        /* Button layout */
+        .classes-buttons a {
+            margin-bottom: 15px;
+        }

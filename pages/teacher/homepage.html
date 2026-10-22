@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Boxicons CSS -->
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
+  <title>EAST-Y CHECK</title>
+  <link rel="stylesheet" />
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap");
+  </style>
+  <link href="../../assets/css/dashboard.css" rel="stylesheet" />
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+
+<body>
+  <!-- navbar -->
+  <nav class="navbar" aria-label="Main Navigation">
+    <div class="logo_item">
+      <i class="bx bx-menu" id="sidebarOpen"></i>
+      <img src="../../assets/img/ue-logo.png" alt=""><strong>EAST-Y CHECK</strong>
+    </div>
+
+    <div class="navbar_content">
+      <i class="bi bi-grid"></i>
+      <i class='bx bx-bell'></i>
+    </div>
+  </nav>
+
+  <!-- Sidebar -->
+  <nav class="sidebar" aria-label="Sidebar Navigation">
+    <div class="menu_content">
+      <ul class="menu_items">
+        <!-- Nav item: Profile -->
+        <li class="item">
+          <a href="#" class="nav_link submenu_item">
+            <span class="navlink_icon">
+              <i class="bx bx-user"></i>
+            </span>
+            <span class="navlink">Profile</span>
+          </a>
+        </li>
+
+        <!-- Nav item: Dashboard -->
+        <li class="item active">
+          <a href="homepage.html" class="nav_link submenu_item">
+            <span class="navlink_icon">
+              <i class="bx bx-home-alt"></i>
+            </span>
+            <span class="navlink">Dashboard</span>
+          </a>
+        </li>
+
+      <ul class="menu_items">
+        <div class="menu_title menu_editor"></div>
+        <li class="item">
+          <a href="classes-selection.html" class="nav_link">
+            <span class="navlink_icon">
+              <i class="bx bx-list-ul"></i>
+            </span>
+            <span class="navlink">Classes</span>
+          </a>
+        </li>
+        <li class="item">
+          <a href="summary.html" class="nav_link">
+            <span class="navlink_icon">
+              <i class="bx bx-cloud-upload"></i>
+            </span>
+            <span class="navlink">Summary</span>
+          </a>
+        </li>
+      </ul>
+
+      <ul class="menu_items">
+        <div class="menu_title menu_setting"></div>
+            </span>
+          </a>
+        </li>
+        <li class="item">
+          <a href="#" class="nav_link">
+            <span class="navlink_icon">
+              <i class="bx bx-layer"></i>
+            </span>
+            <span class="navlink">Features</span>
+          </a>
+        </li>
+      </ul>
+
+      <!-- Logout Button -->
+      <ul class="menu_items">
+        <li class="item">
+          <a href="../../index.html" class="nav_link" id="logoutButton">
+            <span class="navlink_icon">
+              <i class="bx bx-log-out"></i>
+            </span>
+            <span class="navlink">Logout</span>
+          </a>
+        </li>
+      </ul>
+
+      <!-- Sidebar Open / Close -->
+      <div class="bottom_content">
+        <div class="bottom expand_sidebar">
+          <span> Expand</span>
+          <i class='bx bx-collapse-horizontal'></i>
+        </div>
+        <div class="bottom collapse_sidebar">
+          <span> Collapse</span>
+          <i class='bx bx-collapse-horizontal'></i>
+        </div>
+      </div>
+    </div>
+  </nav>
+  
+  
+
+
+
+  <!-- JavaScript -->
+  <script>
+    const body = document.querySelector("body");
+    const darkLight = document.querySelector("#darkLight");
+    const sidebar = document.querySelector(".sidebar");
+    const submenuItems = document.querySelectorAll(".submenu_item");
+    const sidebarOpen = document.querySelector("#sidebarOpen");
+    const sidebarClose = document.querySelector(".collapse_sidebar");
+    const sidebarExpand = document.querySelector(".expand_sidebar");
+    sidebarOpen.addEventListener("click", () => sidebar.classList.toggle("close"));
+    sidebarClose.addEventListener("click", () => {
+      sidebar.classList.add("close", "hoverable");
+    });
+    sidebarExpand.addEventListener("click", () => {
+      sidebar.classList.remove("close", "hoverable");
+    });
+    sidebar.addEventListener("mouseenter", () => {
+      if (sidebar.classList.contains("hoverable")) {
+        sidebar.classList.remove("close");
+      }
+    });
+    sidebar.addEventListener("mouseleave", () => {
+      if (sidebar.classList.contains("hoverable")) {
+        sidebar.classList.add("close");
+      }
+    });
+
+    submenuItems.forEach((item, index) => {
+      item.addEventListener("click", () => {
+        item.classList.toggle("show_submenu");
+        submenuItems.forEach((item2, index2) => {
+          if (index !== index2) {
+            item2.classList.remove("show_submenu");
+          }
+        });
+      });
+    });
+    if (window.innerWidth < 768) {
+      sidebar.classList.add("close");
+    } else {
+      sidebar.classList.remove("close");
+    }
+
+  </script>
+</body>
+
+</html>

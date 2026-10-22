@@ -1,0 +1,36 @@
+.custom-file-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.w-50 {
+    min-width: 200px;
+}
+
+.card {
+    width: 300px;
+    /* Default narrow width */
+    max-width: 100%;
+    transition: width 0.3s ease-in-out;
+    overflow: hidden;
+}
+
+.card.expanded {
+    width: 100%;
+    /* Expands to full width */
+}
+
+#importClassForm {
+    display: none;
+    transition: all 0.3s ease-in-out;
+}
+
+
+
+
+#importClassForm.show {
+    max-height: 500px;
+    /* Adjust as needed */
+    opacity: 1;
+}

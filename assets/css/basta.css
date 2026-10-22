@@ -1,0 +1,118 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+}
+
+.container {
+    margin-top: 20px;
+}
+
+.card {
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.table {
+    margin-top: 20px;
+}
+
+.table th,
+.table td {
+    text-align: center;
+    vertical-align: middle;
+}
+
+.button-container {
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.qr-container {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.qr-code {
+    width: 200px;
+    height: 200px;
+    border-radius: 10px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+    position: relative;
+    margin: auto;
+}
+
+.logo {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 50px;
+    height: 50px;
+}
+
+.date-selector {
+    margin-bottom: 20px;
+}
+
+/* Custom colors for attendance status */
+.status-present {
+    color: #28a745;
+    /* Green */
+    font-weight: bold;
+}
+
+.status-late {
+    color: #fd7e14;
+    /* Orange */
+    font-weight: bold;
+}
+
+.status-absent {
+    color: #dc3545;
+    /* Red */
+    font-weight: bold;
+}
+
+/* Reset Button Custom Style */
+#resetBtn {
+    background-color: #60100B;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+#resetBtn:hover {
+    background-color: #60100B;
+}
+        /* Style for class room and time */
+        #classRoom, #date {
+            font-size: 1.3em; /* Make the text bigger */
+            font-weight: bold; /* Make the text bold */
+            color: #333; /* Set a dark color for visibility */
+            margin: 10px 0; /* Add some spacing between text elements */
+        }
+
+        .class-details {
+            font-size: 1.0em;
+            display: flex;
+            flex-direction: column;
+            align-items: start;
+            text-align: start;
+        }
+        
+
+        /* Styling for the labels (Room, Time) */
+        p strong {
+            font-size: 1.3em; /* Slightly larger label */
+            color: #60100B; /* Red color to match your theme */
+        }
+
+        /* Additional styling to center the text */
+        .card-body p {
+            text-align: center;
+            justify-content: left;
+        }
+        

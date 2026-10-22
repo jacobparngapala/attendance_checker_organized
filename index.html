@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EAST-Y CHECK</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Bootswatch Simplex Theme -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootswatch/4.5.2/simplex/bootstrap.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="./assets/css/drrr.css">
+</head>
+
+<body class="d-flex justify-content-center align-items-center">
+    <div class="background-image"></div>
+
+
+    <div class="container d-flex justify-content-center align-items-center" style="height: 100vh;">
+        <div class="card col-md-4 login-container" id="login-section">
+            <div class="card-body">
+                <h3><b>ONLINE ATTENDANCE SYSTEM</b></h3>
+                <h4><b>Login</b></h4>
+                <div class="mt-5">
+                    <form id="attendanceForm">
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="studentId" placeholder="Student/Teacher ID"
+                                required>
+                            <label for="studentId">Student/Teacher ID</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="password" class="form-control" id="floatingPassword" placeholder="Password"
+                                autocomplete="off" required>
+                            <label for="floatingPassword">Password</label>
+                        </div>
+                        <div class="form-floating mt-3 d-flex align-items-center">
+                        </div>
+                        <div class="d-grid mt-3">
+                            <button class="btn btn-lg btn-primary" type="submit">Log In</button>
+                        </div>
+                        <span id="message"></span> <!-- Add message element for success or error -->
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card col-md-4 mx-auto" id="success-section" style="display: none;">
+        <div class="card-body">
+            <div class="alert alert-success">
+                <h4><strong>Login Success</strong></h4>
+            </div>
+            <h5><b>ICT3 12-1</b></h5>
+            <div class="mt-4">
+                <h4>Date & Time</h4>
+                <h5><b><span id="success-field-dateTime">&nbsp;</span></b></h5>
+                <h4>Student/Teacher ID</h4>
+                <h5><b><span id="success-field-studentId">&nbsp;</span></b></h5>
+                <h4>Name</h4>
+                <h5><b><span id="success-field-name">&nbsp;</span></b></h5>
+                <button id="redirectionButton" class="btn btn-success">Go to Student Dashboard</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
+        import { getDatabase, ref, get, push, set } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyA0hTRuEgjrP9YQ4LwkHcSUf7xkdl9lBgI",
+            authDomain: "attendify12-ai.firebaseapp.com",
+            databaseURL: "https://attendify12-ai-default-rtdb.asia-southeast1.firebasedatabase.app/",
+            projectId: "attendify12-ai",
+            storageBucket: "attendify12-ai.firebasestorage.app",
+            messagingSenderId: "374044642888",
+            appId: "1:374044642888:web:44706986d500af43a0927d"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        function login(event) {
+            event.preventDefault();
+
+            let studentId = document.getElementById('studentId').value.trim().replace(/-/g, "/");
+            let password = document.getElementById('floatingPassword').value.trim();
+
+            if (password.includes("-")) {
+                document.getElementById('message').textContent = 'Incorrect password';
+                document.getElementById('message').style.color = 'red';
+                return;
+            }
+
+            if (!studentId || !password) {
+                document.getElementById('message').textContent = 'Please fill in all fields.';
+                document.getElementById('message').style.color = 'red';
+                return;
+            }
+
+            const isTeacher = studentId.startsWith("T");
+            const refPath = isTeacher ? `Teachers/${studentId}` : `Students/${studentId}`;
+            const userRef = ref(database, refPath);
+
+            get(userRef).then(snapshot => {
+                if (snapshot.exists()) {
+                    const userData = snapshot.val();
+                    const storedPassword = userData.password.replace(/-/g, "/");
+
+                    if (storedPassword === password) {
+                        // Log attendance for students and store teacher login
+                        if (isTeacher) {
+                            // Store Teacher ID in localStorage
+                            localStorage.setItem("teacherID", studentId);
+                            localStorage.setItem("userID", userData.teacherId);
+                            localStorage.setItem("userName", userData.name);
+                            localStorage.setItem("userRole", "Teacher");
+                            console.log("Teacher logged in:", userData.teacherId, userData.name);
+                        } else {
+                            // Store Student login in localStorage
+                            localStorage.setItem("userID", userData.studentId);
+                            localStorage.setItem("userName", userData.name);
+                            localStorage.setItem("userRole", "Student");
+                            console.log("Student logged in:", userData.studentId, userData.name); // Added console.log
+                            // Log Student login in the "logins" node
+                            console.log("Student login attempt:", userData.studentId, userData.name);
+                            const loginsRef = ref(database, 'logins/');
+                            push(loginsRef, {
+                                id: userData[isTeacher ? 'teacherId' : 'studentId'],
+                                name: userData.name,
+                                timestamp: new Date().toISOString(),
+                                role: isTeacher ? "Teacher" : "Student"
+                            }).then(() => {
+                                console.log("Student login recorded in Firebase:", userData.studentId, userData.name);
+                            }).catch(error => {
+                                console.error("Error recording student login:", error);
+                            });
+                        }
+
+                        showSuccessMessage(userData[isTeacher ? 'teacherId' : 'studentId'], userData.name, isTeacher);
+                    } else {
+                        showErrorMessage('Incorrect password.');
+                    }
+                } else {
+                    showErrorMessage(`${isTeacher ? "Teacher" : "Student"} ID not found.`);
+                }
+            }).catch(error => {
+                showErrorMessage('An error occurred. Please try again.');
+                console.error(error);
+            });
+        }
+
+
+        function showSuccessMessage(id, name, isTeacher) {
+            document.getElementById('success-section').style.display = 'block';
+            document.getElementById('login-section').style.display = 'none';
+            document.getElementById('success-field-studentId').textContent = id;
+            document.getElementById('success-field-name').textContent = name;
+            document.getElementById('success-field-dateTime').textContent = new Date().toLocaleString();
+
+            if (!isTeacher) {
+                document.getElementById('redirectionButton').style.display = 'block';
+            }
+
+            setTimeout(() => {
+                if (isTeacher) {
+                    window.location.href = "pages/teacher/classes-selection.html"; // Redirect teacher to their page
+                }
+            }, 2000);
+        }
+
+        function showErrorMessage(message) {
+            document.getElementById('message').textContent = message || 'An error occurred. Please try again later.';
+            document.getElementById('message').style.color = 'red';
+        }
+
+        // Function to redirect when clicking a class button
+        function redirectToClass(teacherID, classID) {
+            window.location.href = `pages/student/classes-student.html`;
+        }
+
+        document.getElementById('attendanceForm').addEventListener('submit', login);
+        document.getElementById('redirectionButton').addEventListener('click', redirectToClass);
+    </script>
+</body>
+
+</html>

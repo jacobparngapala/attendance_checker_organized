@@ -1,0 +1,48 @@
+.navbar-custom {
+    background-color: #60100B;
+}
+
+.class-button {
+    font-size: 1.5rem;
+    color: #60100B;
+    border: 2px solid #60100B;
+}
+
+.class-button:hover {
+    background-color: #60100B;
+    color: white;
+}
+
+.details {
+    margin-top: 10px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+.details.d-none {
+    display: none;
+}
+
+.toggle-button {
+    font-size: 1.5rem;
+    color: #60100B;
+    border: none;
+    background: none;
+    cursor: pointer;
+}
+
+.edit-button {
+    cursor: pointer;
+    color: #60100B;
+    font-size: 1.5rem;
+    border: none;
+    background: none;
+}
+
+.modal-content {
+    background-color: rgba(255, 255, 255, 0.9);
+}
+
+

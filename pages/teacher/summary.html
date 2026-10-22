@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>EAST-Y CHECK</title>
+    <!-- Boxicons CSS -->
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet" />
+    <link rel="stylesheet" />
+    <style>
+        @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap");
+    </style>
+    <link href="../../assets/css/dashboard.css" rel="stylesheet" />
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../../assets/css/styles.css">
+    <!-- Another Custom CSS-->
+    <link rel="stylesheet" href="../../assets/css/basta.css">
+
+    <!-- SheetJS for Excel Export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", async () => {
+            try {
+                await loadFilters();
+            } catch (error) {
+                console.error("Error initializing page:", error);
+            }
+        });
+
+        async function loadFilters() {
+            try {
+                const response = await fetch("http://localhost:5000/getAvailableFilters");
+                if (!response.ok) throw new Error(`Server responded with status ${response.status}`);
+
+                const data = await response.json();
+                if (!data.classList || !Array.isArray(data.classList)) {
+                    throw new Error("Invalid API response: Missing or incorrect 'classList' field.");
+                }
+
+                document.getElementById("startDate").value = data.startDate || "";
+                document.getElementById("endDate").value = data.endDate || "";
+
+                const classSelect = document.getElementById("classSelect");
+                classSelect.innerHTML = "";
+
+                data.classList.forEach(classObj => {
+                    let option = document.createElement("option");
+                    option.value = classObj.id;
+                    option.textContent = classObj.name || classObj.id;
+                    classSelect.appendChild(option);
+                });
+
+            } catch (error) {
+                console.error("Error loading filters:", error);
+                alert("Failed to load filter data. Please try again.");
+            }
+        }
+
+        let fetchedData = [];
+
+        async function fetchAttendanceSummary() {
+            try {
+                const startDate = document.getElementById("startDate").value;
+                const endDate = document.getElementById("endDate").value;
+                const classId = document.getElementById("classSelect").value;
+
+                if (!startDate || !endDate || !classId) {
+                    alert("Please select a date range and a class.");
+                    return;
+                }
+
+                const response = await fetch(`http://localhost:5000/getAttendanceSummary?classId=${classId}&fromDate=${startDate}&toDate=${endDate}`);
+
+                if (!response.ok) throw new Error(`Server responded with status ${response.status}`);
+
+                const data = await response.json();
+                console.log("📜 Fetched Summary Data:", data);
+
+                if (!Array.isArray(data) || data.length === 0) {
+                    alert("No attendance records found.");
+                    return;
+                }
+
+                fetchedData = data; // Store for export
+
+                // Populate summary table
+                const summaryTable = document.getElementById("attendanceSummary");
+                summaryTable.innerHTML = `
+            <tr>
+                <th>Student</th>
+                <th>Total Present</th>
+                <th>Total Late</th>
+                <th>Total Absent</th>
+            </tr>
+        `;
+
+                data.forEach(record => {
+                    let row = `<tr>
+                <td>${record.studentName || "Unknown"}</td>
+                <td>${record.present || 0}</td>
+                <td>${record.late || 0}</td>
+                <td>${record.absent || 0}</td>
+            </tr>`;
+                    summaryTable.innerHTML += row;
+                });
+
+                // ✅ Show the "Print" button after data is fetched
+                document.getElementById("printButton").style.display = "block";
+
+            } catch (error) {
+                console.error("❌ Error fetching attendance summary:", error);
+                alert("Failed to fetch attendance summary. Please try again.");
+            }
+        }
+
+
+        async function exportToExcel() {
+            if (!fetchedData || fetchedData.length === 0) {
+                displayMessage("No data available to export."); // Using a display message function
+                return;
+            }
+
+            const dates = Object.keys(fetchedData[0].attendance || {}).sort();
+            const month = prompt("Enter Month of Attendance:"); //Get month from user.
+
+            const wsData = [
+                ["Daily Attendance Report of Learners for Senior High School"],
+                ["School Name:", "University of the East-Caloocan", "", "", "", "", "", "", "", "Region:", "NCR"],
+                ["Semester:", "1st Semester"],
+                ["Section:", "Section"],
+                ["Month:", month], //Add month here.
+                [""],
+                ["No.", "NAME (Last, First MI.)", "", ...dates, "Total Present", "Total Late", "Total Absent", "Remarks"]
+            ];
+
+            fetchedData.forEach((record, index) => {
+                const studentName = `${record.studentName.replace(/"/g, "") || "Unknown"}`;
+                const attendanceStatus = dates.map(date => {
+                    const status = record.attendance[date];
+                    if (status === "absent") return "x";
+                    if (status === "late") return "∕";
+                    if (status === "cutting") return "⸜⸝";
+                    return "";
+                });
+
+                //Example of calculating the total amount of absences.
+                const totalAbsences = attendanceStatus.filter(status => status === "x").length;
+
+                wsData.push([
+                    index + 1,
+                    studentName,
+                    "",
+                    ...attendanceStatus,
+                    record.present || 0,
+                    record.late || 0,
+                    totalAbsences, //use calculated total.
+                    ""
+                ]);
+            });
+
+            // Create and export workbook
+            const ws = XLSX.utils.aoa_to_sheet(wsData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Attendance Summary");
+            XLSX.writeFile(wb, "Attendance_Summary.xlsx");
+        }
+
+        function displayMessage(message) {
+            const messageArea = document.getElementById("messageArea"); //Example of a message area on the webpage.
+            if (messageArea) {
+                messageArea.textContent = message;
+            } else {
+                alert(message);
+            }
+
+        }
+
+    </script>
+
+</head>
+
+<!-- navbar -->
+<nav class="navbar" aria-label="Main Navigation">
+    <div class="logo_item">
+        <i class="bx bx-menu" id="sidebarOpen"></i>
+        <img src="../../assets/img/ue-logo.png" alt=""><strong>EAST-Y CHECK</strong>
+    </div>
+
+    <div class="navbar_content">
+        <i class="bi bi-grid"></i>
+        <i class='bx bx-bell'></i>
+    </div>
+</nav>
+
+
+<body>
+    <!-- Sidebar -->
+    <nav class="sidebar" aria-label="Sidebar Navigation">
+        <div class="menu_content">
+
+            <ul class="menu_items">
+                <div class="menu_title menu_editor"></div>
+                <li class="item">
+                    <a href="classes-selection.html" class="nav_link">
+                        <span class="navlink_icon">
+                            <i class="bx bx-list-ul"></i>
+                        </span>
+                        <span class="navlink">Classes</span>
+                    </a>
+                </li>
+                <li class="item active">
+                    <a href="summary.html" class="nav_link">
+                        <span class="navlink_icon">
+                            <i class="bx bx-cloud-upload"></i>
+                        </span>
+                        <span class="navlink">Summary</span>
+                    </a>
+                </li>
+            </ul>
+
+            <ul class="menu_items">
+                <div class="menu_title menu_setting"></div>
+                <li class="item">
+                    <a href="../../index.html" class="nav_link" id="logoutButton">
+                        <span class="navlink_icon">
+                            <i class="bx bx-log-out"></i>
+                        </span>
+                        <span class="navlink">Logout</span>
+                    </a>
+                </li>
+            </ul>
+            <!-- Sidebar Open / Close -->
+            <div class="bottom_content">
+                <div class="bottom expand_sidebar">
+                    <span> Expand</span>
+                    <i class='bx bx-collapse-horizontal'></i>
+                </div>
+                <div class="bottom collapse_sidebar">
+                    <span> Collapse</span>
+                    <i class='bx bx-collapse-horizontal'></i>
+                </div>
+            </div>
+        </div>
+    </nav>
+</body>
+
+<body>
+    <div class="container mt-4">
+        <h2 class="mb-3">Attendance Summary</h2>
+
+        <div class="form-group">
+            <label for="startDate">From:</label>
+            <input type="date" id="startDate" class="form-control">
+        </div>
+
+        <div class="form-group">
+            <label for="endDate">To:</label>
+            <input type="date" id="endDate" class="form-control">
+        </div>
+
+        <div class="form-group">
+            <label for="classSelect">Class:</label>
+            <select id="classSelect" class="form-control"></select>
+        </div>
+        <button class="btn btn-primary" onclick="fetchAttendanceSummary()">Get Summary</button>
+
+        <table class="table mt-4" id="attendanceSummary">
+            <tr>
+            </tr>
+        </table>
+        <button id="printButton" class="btn btn-success ml-2" onclick="exportToExcel()"
+            style="display: none;">Print</button>
+    </div>
+</body>
+
+</html>
