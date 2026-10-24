@@ -11,7 +11,7 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-// ✅ Firebase & MongoDB Setup
+//  Firebase & MongoDB Setup
 const firebaseDB = getDatabase();
 const mongoClient = new MongoClient(process.env.MONGO_URI);
 
@@ -28,11 +28,11 @@ async function connectToMongo() {
 }
 
 
-// 🔥 API: Save Attendance to MongoDB
+// API: Save Attendance to MongoDB
 app.post("/saveAttendance", async (req, res) => {
     try {
         const { classId } = req.body;
-        console.log("🔍 Received /saveAttendance request for classId:", classId);
+        console.log("Received /saveAttendance request for classId:", classId);
 
         if (!classId) {
             return res.status(400).json({ error: "Missing classId" });
@@ -47,7 +47,7 @@ app.post("/saveAttendance", async (req, res) => {
     }
 });
 
-// 🔥 API: Get Available Filters (Dates & Classes)
+//  API: Get Available Filters (Dates & Classes)
 app.get("/getAvailableFilters", async (req, res) => {
     try {
         const classesSnapshot = await firebaseDB.ref("classes").get();
@@ -65,7 +65,7 @@ app.get("/getAvailableFilters", async (req, res) => {
             }
         }
 
-        // ✅ Fetch attendance dates
+        // Fetch attendance dates
         const attendanceSnapshot = await firebaseDB.ref("attendance").get();
         const dates = Object.keys(attendanceSnapshot.val() || {}); // Prevents undefined error
         const startDate = dates.length ? dates[0] : null;
@@ -74,13 +74,13 @@ app.get("/getAvailableFilters", async (req, res) => {
         res.json({ startDate, endDate, classList });
 
     } catch (error) {
-        console.error("❌ Error fetching filters:", error);
+        console.error("Error fetching filters:", error);
         res.status(500).json({ error: "Error fetching filters" });
     }
 });
 
 
-// 🔥 API: Get Attendance Summary
+//  API: Get Attendance Summary
 app.get("/getAttendanceSummary", async (req, res) => {
     const { classId, fromDate, toDate } = req.query;
 
@@ -98,7 +98,7 @@ app.get("/getAttendanceSummary", async (req, res) => {
             })
             .toArray();
 
-        console.log("📜 Raw Attendance Data:", records); // Debugging log
+        console.log("Raw Attendance Data:", records); // Debugging log
 
         // Processing attendance records
         let studentSummary = {};
@@ -126,11 +126,11 @@ app.get("/getAttendanceSummary", async (req, res) => {
             });
         });
 
-        console.log("📊 Processed Summary:", Object.values(studentSummary)); // Debugging log
+        console.log("Processed Summary:", Object.values(studentSummary)); // Debugging log
         res.json(Object.values(studentSummary));
 
     } catch (error) {
-        console.error("❌ Error fetching attendance summary:", error);
+        console.error("Error fetching attendance summary:", error);
         res.status(500).json({ error: "Error fetching attendance summary" });
     }
 });
