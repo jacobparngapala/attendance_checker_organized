@@ -155,7 +155,7 @@
             </form>
         </div>
     </div>
-    
+
 
     <script>
         flatpickr("#startTime, #endTime, #editStartTime, #editEndTime", {
@@ -297,6 +297,21 @@
                 // If a file is uploaded, process it
                 if (fileInput.files.length > 0) {
                     const file = fileInput.files[0];
+                    if (!file) {
+                        showError("Choose a file first.");
+                        return;
+                    }
+
+                    if (!file.name.toLower().endsWith(".csv")) {
+                        showError("Wrong file type name");
+                        return;
+                    }
+
+                    if (file.size === 0) {
+                        showError("File is empty");
+                        return;
+                    }
+
                     const reader = new FileReader();
 
                     reader.onload = function (e) {
