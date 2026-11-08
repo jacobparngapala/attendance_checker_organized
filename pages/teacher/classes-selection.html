@@ -310,7 +310,7 @@
                     if (file.size === 0) {
                         showError("File is empty");
                         return;
-                    }
+                    } // Gawa ko po ito
 
                     const reader = new FileReader();
 
@@ -322,6 +322,7 @@
                         students = lines
                             .slice(1) // Skip header
                             .filter(row => row.length >= 6 && row[3] && row[2] && row[5]) // Ensure required fields exist
+                        if (rows.length < 2) return showError("No data rows.") // Error Handler for Empty File
                             .map(row => ({
                                 id: row[3], // Student Number
                                 name: row[2], // Name
@@ -494,6 +495,19 @@
             });
         }
 
+        function removeClass(teacherId, classId, btnContainer) {
+            if (!confirm("Are you sure you want to remove this class?")) {
+                return;
+            }
+            remove(ref(db, `classes/${teacherId}/${classId}`))
+                .then(() => {
+                    btnContainer.remove();
+                    alert("Class succesfully removed.");
+                })
+                .catch((err) => {
+
+                })
+        }
 
         function addClassButton(teacherId, classId, course, section, room, startTime, endTime) {
             if (document.getElementById(`btn-${teacherId}-${classId}`)) return;
@@ -519,9 +533,15 @@
             };
 
             btnContainer.appendChild(btn);
+            if (teacherId === localStorage.getItem("teacherID")) {
+                const removeBtn = document.createElement("button");
+                removeBtn.innerText = "Remove";
+                removeBtn.className = "remove-class-btn";
+                removeBtn.onclick = () => removeClass(teacherId, classId, btnContainer);
+                btnContainer.appendChild(removeBtn);
+            }
             document.getElementById("classButtons").appendChild(btnContainer);
         }
-
 
     </script>
 </body>
