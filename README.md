@@ -1,4 +1,4 @@
-# EAST-Y CHECK — Online Attendance System
+# Online Attendance System
 University of the East (Caloocan) 
 
 A web-based attendance system. Teachers import class lists and show a QR code;
